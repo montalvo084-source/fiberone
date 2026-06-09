@@ -1,8 +1,6 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { useConfetti } from './Confetti.jsx';
 
-const DAILY_GOAL = 25;
-
 function formatDate(dateStr) {
   const [y, m, d] = dateStr.split('-').map(Number);
   return new Date(y, m - 1, d).toLocaleDateString('en-US', {
@@ -47,7 +45,15 @@ function GoalRing({ total, goal }) {
   );
 }
 
-export default function DailyLog({ foods, logs, selectedDate, setSelectedDate, onLogAdded, onLogRemoved }) {
+const SERVING_PRESETS = [
+  { value: '0.5', label: '½' },
+  { value: '1', label: '1' },
+  { value: '1.5', label: '1½' },
+  { value: '2', label: '2' },
+  { value: '3', label: '3' },
+];
+
+export default function DailyLog({ foods, logs, selectedDate, setSelectedDate, onLogAdded, onLogRemoved, dailyGoal }) {
   const [selectedFood, setSelectedFood] = useState('');
   const [servings, setServings] = useState('1');
   const [submitting, setSubmitting] = useState(false);
@@ -65,9 +71,29 @@ export default function DailyLog({ foods, logs, selectedDate, setSelectedDate, o
     [dayLogs]
   );
 
+  const weeklyGoal = dailyGoal * 7;
+
+  const weeklyTotal = useMemo(() => {
+    const [y, m, d] = selectedDate.split('-').map(Number);
+    const anchor = new Date(y, m - 1, d);
+    const day = anchor.getDay();
+    const monday = new Date(anchor);
+    monday.setDate(anchor.getDate() - ((day + 6) % 7));
+    const weekDates = new Set(
+      Array.from({ length: 7 }, (_, i) => {
+        const date = new Date(monday);
+        date.setDate(monday.getDate() + i);
+        return date.toISOString().slice(0, 10);
+      })
+    );
+    return logs.filter(l => weekDates.has(l.date)).reduce((s, l) => s + l.fiber, 0);
+  }, [logs, selectedDate]);
+
   useEffect(() => {
     prevTotal.current = total;
   }, []);
+
+  const selectedFoodObj = foods.find(f => f.id === selectedFood);
 
   function showToast(msg) {
     setToast(msg);
@@ -89,7 +115,7 @@ export default function DailyLog({ foods, logs, selectedDate, setSelectedDate, o
       const newTotal = oldTotal + entry.fiber;
       prevTotal.current = newTotal;
 
-      if (oldTotal < DAILY_GOAL && newTotal >= DAILY_GOAL) {
+      if (oldTotal < dailyGoal && newTotal >= dailyGoal) {
         triggerGoal();
         showToast(`🏆 Daily goal hit! ${newTotal.toFixed(1)}g total`);
       } else {
@@ -129,6 +155,20 @@ export default function DailyLog({ foods, logs, selectedDate, setSelectedDate, o
         </div>
       )}
 
+      {/* Weekly mini-banner */}
+      <div className="bg-emerald-100 rounded-xl px-4 py-2.5 flex items-center gap-3">
+        <span className="text-xs font-semibold text-emerald-600 whitespace-nowrap">This week</span>
+        <div className="flex-1 bg-emerald-200 rounded-full h-2">
+          <div
+            className="bg-emerald-500 h-2 rounded-full transition-all duration-500"
+            style={{ width: `${Math.min(weeklyTotal / weeklyGoal, 1) * 100}%` }}
+          />
+        </div>
+        <span className="text-xs font-semibold text-emerald-700 whitespace-nowrap">
+          {weeklyTotal.toFixed(1)}g / {weeklyGoal}g
+        </span>
+      </div>
+
       {/* Date nav */}
       <div className="card flex items-center justify-between">
         <button onClick={() => changeDate(-1)} className="btn-ghost text-xl px-2">‹</button>
@@ -149,37 +189,75 @@ export default function DailyLog({ foods, logs, selectedDate, setSelectedDate, o
 
       {/* Goal ring + log form */}
       <div className="card flex flex-col sm:flex-row gap-6 items-center">
-        <GoalRing total={total} goal={DAILY_GOAL} />
+        <GoalRing total={total} goal={dailyGoal} />
 
-        <form onSubmit={handleLog} className="flex-1 space-y-3 w-full">
-          <div>
-            <label className="text-xs font-semibold text-emerald-600 uppercase tracking-wide mb-1 block">Food</label>
-            <select
-              value={selectedFood}
-              onChange={e => setSelectedFood(e.target.value)}
-              className="input"
-              required
-            >
-              <option value="">Pick a food...</option>
-              {foods.map(f => (
-                <option key={f.id} value={f.id}>
-                  {f.name} — {f.fiber}g fiber
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="text-xs font-semibold text-emerald-600 uppercase tracking-wide mb-1 block">Servings</label>
-            <input
-              type="number"
-              min="0.25"
-              step="0.25"
-              value={servings}
-              onChange={e => setServings(e.target.value)}
-              className="input"
-              required
-            />
-          </div>
+        <form onSubmit={handleLog} className="flex-1 space-y-4 w-full">
+          {/* Food selection */}
+          {!selectedFood ? (
+            <div>
+              <label className="text-xs font-semibold text-emerald-600 uppercase tracking-wide mb-2 block">
+                Choose a Food
+              </label>
+              {foods.length === 0 ? (
+                <p className="text-sm text-emerald-300 text-center py-4">
+                  No foods yet — add some in the Foods tab
+                </p>
+              ) : (
+                <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1">
+                  {foods.map(f => (
+                    <button
+                      key={f.id}
+                      type="button"
+                      onClick={() => { setSelectedFood(f.id); setServings('1'); }}
+                      className="text-left px-3 py-2.5 rounded-xl border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 hover:border-emerald-300 active:scale-95 transition-all duration-150"
+                    >
+                      <p className="font-medium text-emerald-900 text-sm leading-tight">{f.name}</p>
+                      <p className="text-xs text-emerald-500 mt-0.5">{f.fiber}g / serving</p>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : (
+            <div>
+              {/* Selected food chip */}
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2 bg-emerald-500 text-white px-3 py-2 rounded-xl">
+                  <span className="font-semibold text-sm">{selectedFoodObj?.name}</span>
+                  <span className="text-emerald-200 text-xs">{selectedFoodObj?.fiber}g/serving</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setSelectedFood('')}
+                  className="text-xs text-emerald-400 hover:text-emerald-600 underline"
+                >
+                  Change
+                </button>
+              </div>
+
+              {/* Serving presets */}
+              <label className="text-xs font-semibold text-emerald-600 uppercase tracking-wide mb-2 block">
+                Servings
+              </label>
+              <div className="flex gap-2 flex-wrap">
+                {SERVING_PRESETS.map(s => (
+                  <button
+                    key={s.value}
+                    type="button"
+                    onClick={() => setServings(s.value)}
+                    className={`px-4 py-2 rounded-xl text-sm font-semibold border transition-all duration-150 active:scale-95 ${
+                      servings === s.value
+                        ? 'bg-emerald-500 border-emerald-500 text-white'
+                        : 'bg-white border-emerald-200 text-emerald-700 hover:border-emerald-400'
+                    }`}
+                  >
+                    {s.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           <button type="submit" disabled={submitting || !selectedFood} className="btn-primary w-full">
             {submitting ? 'Logging…' : '+ Log It'}
           </button>

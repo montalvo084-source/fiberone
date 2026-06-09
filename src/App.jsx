@@ -2,11 +2,13 @@ import { useState, useEffect } from 'react';
 import DailyLog from './components/DailyLog.jsx';
 import WeeklyView from './components/WeeklyView.jsx';
 import FoodLibrary from './components/FoodLibrary.jsx';
+import Settings from './components/Settings.jsx';
 
 const TABS = [
   { id: 'daily', label: '📅 Daily' },
   { id: 'weekly', label: '📊 Weekly' },
   { id: 'foods', label: '🥦 Foods' },
+  { id: 'settings', label: '⚙️ Goals' },
 ];
 
 export default function App() {
@@ -14,10 +16,12 @@ export default function App() {
   const [selectedDate, setSelectedDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [foods, setFoods] = useState([]);
   const [logs, setLogs] = useState([]);
+  const [settings, setSettings] = useState({ dailyGoal: 25 });
 
   useEffect(() => {
     fetchFoods();
     fetchLogs();
+    fetchSettings();
   }, []);
 
   async function fetchFoods() {
@@ -28,6 +32,11 @@ export default function App() {
   async function fetchLogs() {
     const res = await fetch('/api/logs');
     setLogs(await res.json());
+  }
+
+  async function fetchSettings() {
+    const res = await fetch('/api/settings');
+    setSettings(await res.json());
   }
 
   function navigateToDate(date) {
@@ -68,18 +77,26 @@ export default function App() {
             setSelectedDate={setSelectedDate}
             onLogAdded={fetchLogs}
             onLogRemoved={fetchLogs}
+            dailyGoal={settings.dailyGoal}
           />
         )}
         {tab === 'weekly' && (
           <WeeklyView
             logs={logs}
             onDayClick={navigateToDate}
+            dailyGoal={settings.dailyGoal}
           />
         )}
         {tab === 'foods' && (
           <FoodLibrary
             foods={foods}
             onFoodsChanged={fetchFoods}
+          />
+        )}
+        {tab === 'settings' && (
+          <Settings
+            settings={settings}
+            onSettingsSaved={fetchSettings}
           />
         )}
       </main>

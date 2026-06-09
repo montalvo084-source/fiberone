@@ -1,8 +1,5 @@
 import { useMemo } from 'react';
 
-const DAILY_GOAL = 25;
-const WEEKLY_GOAL = 175;
-
 function getWeekDates(anchorDate) {
   const [y, m, d] = anchorDate.split('-').map(Number);
   const anchor = new Date(y, m - 1, d);
@@ -27,7 +24,8 @@ function dayNum(dateStr) {
   return new Date(y, m - 1, d).getDate();
 }
 
-export default function WeeklyView({ logs, onDayClick }) {
+export default function WeeklyView({ logs, onDayClick, dailyGoal }) {
+  const weeklyGoal = dailyGoal * 7;
   const today = new Date().toISOString().slice(0, 10);
   const weekDates = useMemo(() => getWeekDates(today), [today]);
 
@@ -45,7 +43,7 @@ export default function WeeklyView({ logs, onDayClick }) {
     [dailyTotals]
   );
 
-  const weekPct = Math.min(weekTotal / WEEKLY_GOAL, 1);
+  const weekPct = Math.min(weekTotal / weeklyGoal, 1);
 
   return (
     <div className="space-y-5">
@@ -54,7 +52,7 @@ export default function WeeklyView({ logs, onDayClick }) {
         <div className="flex items-center justify-between mb-4">
           <h2 className="font-bold text-emerald-800 text-lg">This Week</h2>
           <span className="text-sm text-emerald-500">
-            {weekTotal.toFixed(1)}g / {WEEKLY_GOAL}g
+            {weekTotal.toFixed(1)}g / {weeklyGoal}g
           </span>
         </div>
 
@@ -67,7 +65,7 @@ export default function WeeklyView({ logs, onDayClick }) {
         </div>
         <p className="text-xs text-emerald-400 text-right">{Math.round(weekPct * 100)}% of weekly goal</p>
 
-        {weekTotal >= WEEKLY_GOAL && (
+        {weekTotal >= weeklyGoal && (
           <p className="text-emerald-600 font-semibold text-sm text-center mt-2">
             🏆 Weekly goal achieved!
           </p>
@@ -81,10 +79,10 @@ export default function WeeklyView({ logs, onDayClick }) {
         <div className="grid grid-cols-7 gap-2">
           {weekDates.map(date => {
             const fiber = dailyTotals[date] || 0;
-            const pct = Math.min(fiber / DAILY_GOAL, 1);
+            const pct = Math.min(fiber / dailyGoal, 1);
             const isToday = date === today;
             const isFuture = date > today;
-            const isHit = fiber >= DAILY_GOAL;
+            const isHit = fiber >= dailyGoal;
 
             return (
               <button
@@ -129,7 +127,7 @@ export default function WeeklyView({ logs, onDayClick }) {
         {[
           {
             label: 'Days Hit Goal',
-            value: weekDates.filter(d => (dailyTotals[d] || 0) >= DAILY_GOAL).length,
+            value: weekDates.filter(d => (dailyTotals[d] || 0) >= dailyGoal).length,
             suffix: '/ 7',
           },
           {

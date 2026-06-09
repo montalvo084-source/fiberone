@@ -37,6 +37,17 @@ function writeDB(data) {
   writeFileSync(DB_PATH, JSON.stringify(data, null, 2));
 }
 
+const DEFAULT_SETTINGS = { dailyGoal: 25 };
+
+function readSettings() {
+  const db = readDB();
+  if (!db.settings) {
+    db.settings = { ...DEFAULT_SETTINGS };
+    writeDB(db);
+  }
+  return db.settings;
+}
+
 // Foods
 app.get('/api/foods', (req, res) => {
   const db = readDB();
@@ -90,6 +101,22 @@ app.delete('/api/logs/:id', (req, res) => {
   db.logs = db.logs.filter(l => l.id !== req.params.id);
   writeDB(db);
   res.json({ ok: true });
+});
+
+// Settings
+app.get('/api/settings', (req, res) => {
+  res.json(readSettings());
+});
+
+app.put('/api/settings', (req, res) => {
+  const { dailyGoal } = req.body;
+  if (!dailyGoal || typeof dailyGoal !== 'number' || dailyGoal < 1) {
+    return res.status(400).json({ error: 'dailyGoal must be a positive number' });
+  }
+  const db = readDB();
+  db.settings = { ...DEFAULT_SETTINGS, ...db.settings, dailyGoal };
+  writeDB(db);
+  res.json(db.settings);
 });
 
 // Serve production build

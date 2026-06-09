@@ -1,0 +1,80 @@
+{
+  "foods": [
+    {
+      "id": "f53d0461-f3ca-48e3-8b4e-753b6e1b8987",
+      "name": "Banana",
+      "fiber": 3.1
+    },
+    {
+      "id": "d33dcbee-af30-4a6d-90e8-7c7cc5a724d6",
+      "name": "Avocado",
+      "fiber": 10
+    },
+    {
+      "id": "a1a0bf4c-1f6b-4ce8-85af-8013c50eef17",
+      "name": "Oats (100g)",
+      "fiber": 10
+    },
+    {
+      "id": "e31f7c9e-9959-41bf-9871-912bc6c8c609",
+      "name": "Black Beans (1 cup)",
+      "fiber": 15
+    },
+    {
+      "id": "24397b55-570f-4aac-8029-69c9e6c9b2dc",
+      "name": "Lentils (1 cup)",
+      "fiber": 15.6
+    },
+    {
+      "id": "d98b43d7-0893-4450-bc1b-2aaf0ffe694e",
+      "name": "Broccoli (1 cup)",
+      "fiber": 5
+    },
+    {
+      "id": "5ae260b4-9ae2-4a95-9ce2-a60abf28d166",
+      "name": "Chia Seeds (1 tbsp)",
+      "fiber": 5
+    },
+    {
+      "id": "0ac749ec-2dff-4cc6-a8f4-2ce1ff42377a",
+      "name": "Almonds (1 oz)",
+      "fiber": 3.5
+    },
+    {
+      "id": "41297b5f-1397-4bb5-9bd4-1f848c6aca3c",
+      "name": "Sweet Potato",
+      "fiber": 3.8
+    },
+    {
+      "id": "40758480-b3c5-4eb9-9978-b46a29b6e5a2",
+      "name": "pear",
+      "fiber": 4
+    }
+  ],
+  "logs": [
+    {
+      "id": "b94aa964-60d9-428b-82b7-3a6561e3f612",
+      "foodId": "dd693723-5f66-497f-afed-89192791d746",
+      "foodName": "Apple",
+      "servings": 1,
+      "fiber": 4.4,
+      "date": "2026-06-09"
+    },
+    {
+      "id": "534353c9-5553-482c-8a71-949292e911dc",
+      "foodId": "dd693723-5f66-497f-afed-89192791d746",
+      "foodName": "Apple",
+      "servings": 1,
+      "fiber": 4.4,
+      "date": "2026-06-09"
+    },
+    {
+      "id": "157df726-372a-4df3-b839-49c11ee092bd",
+      "foodId": "dd693723-5f66-497f-afed-89192791d746",
+      "foodName": "Apple",
+      "servings": 1,
+      "fiber": 4.4,
+      "date": "2026-06-09"
+    }
+  ]
+}

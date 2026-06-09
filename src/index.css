@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-emerald-50 min-h-screen font-sans text-emerald-950;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-white rounded-2xl shadow-sm border border-emerald-100 p-6;
+  }
+
+  .btn-primary {
+    @apply bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white font-semibold px-5 py-2.5 rounded-xl transition-colors duration-150 disabled:opacity-40 disabled:cursor-not-allowed;
+  }
+
+  .btn-ghost {
+    @apply text-emerald-600 hover:bg-emerald-50 active:bg-emerald-100 px-3 py-1.5 rounded-lg transition-colors duration-150 text-sm font-medium;
+  }
+
+  .btn-danger {
+    @apply text-red-400 hover:text-red-600 hover:bg-red-50 p-1.5 rounded-lg transition-colors duration-150;
+  }
+
+  .input {
+    @apply border border-emerald-200 rounded-xl px-3 py-2 text-emerald-900 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent placeholder-emerald-300 w-full;
+  }
+
+  .tab {
+    @apply px-5 py-2.5 rounded-xl font-medium text-sm transition-all duration-150;
+  }
+
+  .tab-active {
+    @apply bg-emerald-500 text-white shadow-sm;
+  }
+
+  .tab-inactive {
+    @apply text-emerald-600 hover:bg-emerald-100;
+  }
+}

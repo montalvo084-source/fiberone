@@ -96,6 +96,24 @@ app.post('/api/logs', (req, res) => {
   res.status(201).json(entry);
 });
 
+app.post('/api/logs/direct', (req, res) => {
+  const { grams, date } = req.body;
+  const g = parseFloat(grams);
+  if (!g || g <= 0 || !date) return res.status(400).json({ error: 'grams and date required' });
+  const db = readDB();
+  const entry = {
+    id: randomUUID(),
+    foodId: null,
+    foodName: 'Quick Add',
+    servings: 1,
+    fiber: Math.round(g * 10) / 10,
+    date,
+  };
+  db.logs.push(entry);
+  writeDB(db);
+  res.status(201).json(entry);
+});
+
 app.delete('/api/logs/:id', (req, res) => {
   const db = readDB();
   db.logs = db.logs.filter(l => l.id !== req.params.id);

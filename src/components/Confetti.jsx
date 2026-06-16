@@ -31,5 +31,15 @@ export function useConfetti() {
     }, 500);
   }
 
-  return { triggerLog, triggerGoal };
+  function triggerMilestone() {
+    confetti({
+      particleCount: 60,
+      spread: 80,
+      origin: { y: 0.6 },
+      colors: MULTI_PALETTE,
+      scalar: 0.85,
+    });
+  }
+
+  return { triggerLog, triggerGoal, triggerMilestone };
 }

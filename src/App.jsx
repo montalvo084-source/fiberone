@@ -1,4 +1,11 @@
 import { useState, useEffect } from 'react';
+
+function localDateStr(date) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
 import DailyLog from './components/DailyLog.jsx';
 import WeeklyView from './components/WeeklyView.jsx';
 import FoodLibrary from './components/FoodLibrary.jsx';
@@ -13,7 +20,7 @@ const TABS = [
 
 export default function App() {
   const [tab, setTab] = useState('daily');
-  const [selectedDate, setSelectedDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const [selectedDate, setSelectedDate] = useState(() => localDateStr(new Date()));
   const [foods, setFoods] = useState([]);
   const [logs, setLogs] = useState([]);
   const [settings, setSettings] = useState({ dailyGoal: 25 });

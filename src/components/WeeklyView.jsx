@@ -1,5 +1,12 @@
 import { useMemo } from 'react';
 
+function localDateStr(date) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
 function getWeekDates(anchorDate) {
   const [y, m, d] = anchorDate.split('-').map(Number);
   const anchor = new Date(y, m - 1, d);
@@ -10,7 +17,7 @@ function getWeekDates(anchorDate) {
   return Array.from({ length: 7 }, (_, i) => {
     const date = new Date(monday);
     date.setDate(monday.getDate() + i);
-    return date.toISOString().slice(0, 10);
+    return localDateStr(date);
   });
 }
 
@@ -26,7 +33,7 @@ function dayNum(dateStr) {
 
 export default function WeeklyView({ logs, onDayClick, dailyGoal }) {
   const weeklyGoal = dailyGoal * 7;
-  const today = new Date().toISOString().slice(0, 10);
+  const today = localDateStr(new Date());
   const weekDates = useMemo(() => getWeekDates(today), [today]);
 
   const dailyTotals = useMemo(() => {

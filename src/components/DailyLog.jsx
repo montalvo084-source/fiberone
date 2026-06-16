@@ -1,4 +1,11 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
+
+function localDateStr(date) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
 import { useConfetti } from './Confetti.jsx';
 
 function formatDate(dateStr) {
@@ -167,7 +174,7 @@ export default function DailyLog({ foods, logs, selectedDate, setSelectedDate, o
       Array.from({ length: 7 }, (_, i) => {
         const date = new Date(monday);
         date.setDate(monday.getDate() + i);
-        return date.toISOString().slice(0, 10);
+        return localDateStr(date);
       })
     );
     return logs.filter(l => weekDates.has(l.date)).reduce((s, l) => s + l.fiber, 0);
@@ -247,10 +254,10 @@ export default function DailyLog({ foods, logs, selectedDate, setSelectedDate, o
   function changeDate(offset) {
     const [y, m, d] = selectedDate.split('-').map(Number);
     const date = new Date(y, m - 1, d + offset);
-    setSelectedDate(date.toISOString().slice(0, 10));
+    setSelectedDate(localDateStr(date));
   }
 
-  const today = new Date().toISOString().slice(0, 10);
+  const today = localDateStr(new Date());
   const isToday = selectedDate === today;
 
   return (

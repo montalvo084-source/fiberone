@@ -54,7 +54,7 @@ function GoalDisplay({ total, goal }) {
   );
 }
 
-const QUICK_GRAMS = [20, 30, 40];
+const QUICK_GRAMS = [1, 2, 3, 5];
 
 function QuickAdd({ onAdd, submitting }) {
   const [showCustom, setShowCustom] = useState(false);
